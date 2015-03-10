@@ -58,7 +58,7 @@ namespace Microsoft.Data.Entity.Query
             protected set
             {
                 Check.NotNull(value, nameof(value));
-                
+
                 _expression = value;
             }
         }
@@ -222,20 +222,20 @@ namespace Microsoft.Data.Entity.Query
 
             foreach (var include
                 in from queryAnnotation in _queryAnnotations
-                    let includeResultOperator = queryAnnotation.ResultOperator as IncludeResultOperator
-                    where includeResultOperator != null
-                    let navigationPath
-                        = BindNavigationPathMemberExpression(
-                            (MemberExpression)includeResultOperator.NavigationPropertyPath,
-                            (ns, _) => BindChainedNavigations(ns, includeResultOperator.ChainedNavigationProperties).ToArray())
-                    orderby navigationPath != null
-                            && navigationPath.First().PointsToPrincipal
-                    select new
-                        {
-                            navigationPath,
-                            queryAnnotation.QuerySource,
-                            includeResultOperator.NavigationPropertyPath
-                        })
+                   let includeResultOperator = queryAnnotation.ResultOperator as IncludeResultOperator
+                   where includeResultOperator != null
+                   let navigationPath
+                       = BindNavigationPathMemberExpression(
+                           (MemberExpression)includeResultOperator.NavigationPropertyPath,
+                           (ns, _) => BindChainedNavigations(ns, includeResultOperator.ChainedNavigationProperties).ToArray())
+                   orderby navigationPath != null
+                           && navigationPath.First().PointsToPrincipal
+                   select new
+                   {
+                       navigationPath,
+                       queryAnnotation.QuerySource,
+                       includeResultOperator.NavigationPropertyPath
+                   })
             {
                 if (include.navigationPath != null)
                 {
@@ -283,7 +283,7 @@ namespace Microsoft.Data.Entity.Query
             if (chainedNavigationProperties != null)
             {
                 foreach (
-                    var navigation in 
+                    var navigation in
                         from propertyInfo in chainedNavigationProperties
                         let entityType
                             = QueryCompilationContext.Model
@@ -371,14 +371,14 @@ namespace Microsoft.Data.Entity.Query
         {
             return
                 (from qsre in querySourceReferenceExpressions
-                    select
-                        (Func<TResult, object>)
-                            AccessorFindingExpressionTreeVisitor
-                                .FindAccessorLambda(
-                                    qsre,
-                                    selector,
-                                    Expression.Parameter(typeof(TResult)))
-                                .Compile()
+                 select
+                     (Func<TResult, object>)
+                         AccessorFindingExpressionTreeVisitor
+                             .FindAccessorLambda(
+                                 qsre,
+                                 selector,
+                                 Expression.Parameter(typeof(TResult)))
+                             .Compile()
                     )
                     .ToList();
         }
@@ -713,9 +713,9 @@ namespace Microsoft.Data.Entity.Query
         }
 
         public override void VisitOrdering(
-            [NotNull] Ordering ordering, 
-            [NotNull] QueryModel queryModel, 
-            [NotNull] OrderByClause orderByClause, 
+            [NotNull] Ordering ordering,
+            [NotNull] QueryModel queryModel,
+            [NotNull] OrderByClause orderByClause,
             int index)
         {
             Check.NotNull(ordering, nameof(ordering));
