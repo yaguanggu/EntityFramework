@@ -823,6 +823,30 @@ namespace Microsoft.Data.Entity.FunctionalTests
         }
 
         [Fact]
+        public virtual void Where_bool_member_equal_true()
+        {
+            AssertQuery<Product>(ps => ps.Where(p => p.Discontinued == true), entryCount: 8);
+        }
+
+        [Fact]
+        public virtual void Where_bool_member_equal_false()
+        {
+            AssertQuery<Product>(ps => ps.Where(p => false == p.Discontinued), entryCount: 69);
+        }
+
+        [Fact]
+        public virtual void Where_not_bool_member_not_equal_false()
+        {
+            AssertQuery<Product>(ps => ps.Where(p => false != !p.Discontinued), entryCount: 69);
+        }
+
+        [Fact]
+        public virtual void Where_not_bool_member_not_equal_true()
+        {
+            AssertQuery<Product>(ps => ps.Where(p => !p.Discontinued != true), entryCount: 8);
+        }
+
+        [Fact]
         public virtual void Where_bool_member_false()
         {
             AssertQuery<Product>(ps => ps.Where(p => !p.Discontinued), entryCount: 69);
@@ -856,6 +880,18 @@ namespace Microsoft.Data.Entity.FunctionalTests
         public virtual void Where_bool_member_in_complex_predicate()
         {
             AssertQuery<Product>(ps => ps.Where(p => p.ProductID > 100 && p.Discontinued || (p.Discontinued == true)), entryCount: 8);
+        }
+
+        ////[Fact]
+        public virtual void Where_bool_member_compared_to_complex_expression()
+        {
+            AssertQuery<Product>(ps => ps.Where(p => p.Discontinued == (p.ProductID > 100)), entryCount: 69);
+        }
+
+        [Fact]
+        public virtual void Where_bool_constant_compared_to_complex_expression()
+        {
+            AssertQuery<Product>(ps => ps.Where(p => (p.ProductID < 50) == true), entryCount: 49);
         }
 
         [Fact]

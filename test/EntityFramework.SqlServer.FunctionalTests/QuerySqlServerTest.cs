@@ -1559,6 +1559,50 @@ WHERE [p].[Discontinued] = 1",
                 Sql);
         }
 
+        public override void Where_bool_member_equal_false()
+        {
+            base.Where_bool_member_equal_false();
+
+            Assert.Equal(
+                @"SELECT [p].[Discontinued], [p].[ProductID], [p].[ProductName], [p].[UnitsInStock]
+FROM [Products] AS [p]
+WHERE NOT [p].[Discontinued] = 1",
+                Sql);
+        }
+
+        public override void Where_bool_member_equal_true()
+        {
+            base.Where_bool_member_equal_true();
+
+            Assert.Equal(
+                @"SELECT [p].[Discontinued], [p].[ProductID], [p].[ProductName], [p].[UnitsInStock]
+FROM [Products] AS [p]
+WHERE [p].[Discontinued] = 1",
+                Sql);
+        }
+
+        public override void Where_not_bool_member_not_equal_false()
+        {
+            base.Where_not_bool_member_not_equal_false();
+
+            Assert.Equal(
+                @"SELECT [p].[Discontinued], [p].[ProductID], [p].[ProductName], [p].[UnitsInStock]
+FROM [Products] AS [p]
+WHERE NOT [p].[Discontinued] = 1",
+                Sql);
+        }
+
+        public override void Where_not_bool_member_not_equal_true()
+        {
+            base.Where_not_bool_member_not_equal_true();
+
+            Assert.Equal(
+                @"SELECT [p].[Discontinued], [p].[ProductID], [p].[ProductName], [p].[UnitsInStock]
+FROM [Products] AS [p]
+WHERE NOT NOT [p].[Discontinued] = 1",
+                Sql);
+        }
+
         public override void Where_bool_member_false()
         {
             base.Where_bool_member_false();
@@ -1622,6 +1666,28 @@ WHERE [p].[Discontinued] = 1",
                 @"SELECT [p].[Discontinued], [p].[ProductID], [p].[ProductName], [p].[UnitsInStock]
 FROM [Products] AS [p]
 WHERE (([p].[ProductID] > 100 AND [p].[Discontinued] = 1) OR [p].[Discontinued] = 1)",
+                Sql);
+        }
+
+        public override void Where_bool_member_compared_to_complex_expression()
+        {
+            base.Where_bool_member_compared_to_complex_expression();
+
+            Assert.Equal(
+                @"SELECT [p].[Discontinued], [p].[ProductID], [p].[ProductName], [p].[UnitsInStock]
+FROM [Products] AS [p]
+WHERE [p].[Discontinued] = (CASE WHEN ([p].[ProductID] > 100) THEN cast(1 as bit) WHEN NOT ([p].[ProductID] > 100) THEN cast(0 as bit) END)",
+                Sql);
+        }
+
+        public override void Where_bool_constant_compared_to_complex_expression()
+        {
+            base.Where_bool_constant_compared_to_complex_expression();
+
+            Assert.Equal(
+                @"SELECT [p].[Discontinued], [p].[ProductID], [p].[ProductName], [p].[UnitsInStock]
+FROM [Products] AS [p]
+WHERE [p].[ProductID] < 50",
                 Sql);
         }
 

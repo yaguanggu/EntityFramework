@@ -144,7 +144,8 @@
     <Compile Include="Query\AsyncQueryMethodProvider.cs" />
     <Compile Include="Query\CommandBuilder.cs" />
     <Compile Include="Query\CommandParameter.cs" />
-    <Compile Include="Query\EqualityPredicateOptimizer.cs" />
+    <Compile Include="Query\EqualityPredicateConstantPruner.cs" />
+    <Compile Include="Query\EqualityPredicateInOptimizer.cs" />
     <Compile Include="Query\Expressions\ColumnAggregateExpression.cs" />
     <Compile Include="Query\Expressions\DiscriminatorPredicateExpression.cs" />
     <Compile Include="Query\Expressions\InExpression.cs" />
