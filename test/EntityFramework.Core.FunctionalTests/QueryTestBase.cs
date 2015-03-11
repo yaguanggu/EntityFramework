@@ -231,9 +231,9 @@ namespace Microsoft.Data.Entity.FunctionalTests
         {
             AssertQuery<Customer, Order>((cs, os) =>
                 (from c in cs
-                    from o in os
-                    orderby c.CustomerID, o.OrderID
-                    select new { c, o })
+                 from o in os
+                 orderby c.CustomerID, o.OrderID
+                 select new { c, o })
                     .Take(1)
                     .Single());
         }
@@ -707,7 +707,7 @@ namespace Microsoft.Data.Entity.FunctionalTests
                       || c.City == "Seattle"
                 select new { c, e });
         }
-        
+
         [Fact]
         public virtual void Where_select_many_or4()
         {
@@ -1181,15 +1181,15 @@ namespace Microsoft.Data.Entity.FunctionalTests
                 from c in cs
                 where c.CustomerID == "ALFKI"
                 select new
-                    {
-                        CustomerId = c.CustomerID,
-                        OrderIds
+                {
+                    CustomerId = c.CustomerID,
+                    OrderIds
                             = os.Where(o => o.CustomerID == c.CustomerID
                                             && o.OrderDate.Value.Year == 1997)
                                 .Select(o => o.OrderID)
                                 .OrderBy(o => o),
-                        Customer = c
-                    },
+                    Customer = c
+                },
                 asserter:
                     (l2oResults, efResults) =>
                         {
@@ -1209,9 +1209,9 @@ namespace Microsoft.Data.Entity.FunctionalTests
                 es =>
                     from e1 in es
                     select (from e2 in es
-                        select (from e3 in es
-                            orderby e3.EmployeeID
-                            select e3)),
+                            select (from e3 in es
+                                    orderby e3.EmployeeID
+                                    select e3)),
                 asserter:
                     (l2oResults, efResults) =>
                         {
@@ -1256,10 +1256,10 @@ namespace Microsoft.Data.Entity.FunctionalTests
                 es =>
                     from e1 in es
                     where (from e2 in es
-                        where (from e3 in es
-                            orderby e3.EmployeeID
-                            select e3).Any()
-                        select e2).Any()
+                           where (from e3 in es
+                                  orderby e3.EmployeeID
+                                  select e3).Any()
+                           select e2).Any()
                     orderby e1.EmployeeID
                     select e1,
                 assertOrder: true,
@@ -1274,13 +1274,13 @@ namespace Microsoft.Data.Entity.FunctionalTests
                 where c.City == "London"
                 orderby c.CustomerID
                 select (from o1 in os
-                    where o1.CustomerID == c.CustomerID
-                          && o1.OrderDate.Value.Year == 1997
-                    orderby o1.OrderID
-                    select (from o2 in os
                         where o1.CustomerID == c.CustomerID
-                        orderby o2.OrderID
-                        select o1.OrderID)),
+                              && o1.OrderDate.Value.Year == 1997
+                        orderby o1.OrderID
+                        select (from o2 in os
+                                where o1.CustomerID == c.CustomerID
+                                orderby o2.OrderID
+                                select o1.OrderID)),
                 asserter:
                     (l2oResults, efResults) =>
                         {
@@ -1312,9 +1312,9 @@ namespace Microsoft.Data.Entity.FunctionalTests
         {
             AssertQuery<Employee, Customer>(
                 (es, cs) => from e1 in es
-                    from s in new[] { "a", "b" }
-                    from c in cs
-                    select new { e1, s, c });
+                            from s in new[] { "a", "b" }
+                            from c in cs
+                            select new { e1, s, c });
         }
 
         [Fact]
@@ -1322,8 +1322,8 @@ namespace Microsoft.Data.Entity.FunctionalTests
         {
             AssertQuery<Employee, Customer>(
                 (es, cs) => from e in es
-                    from c in cs
-                    select new { c, e });
+                            from c in cs
+                            select new { c, e });
         }
 
         [Fact]
@@ -1331,9 +1331,9 @@ namespace Microsoft.Data.Entity.FunctionalTests
         {
             AssertQuery<Employee, Customer>(
                 (es, cs) => from e1 in es
-                    from c in cs
-                    from e2 in es
-                    select new { e1, c, e2.FirstName });
+                            from c in cs
+                            from e2 in es
+                            select new { e1, c, e2.FirstName });
         }
 
         [Fact]
@@ -1353,8 +1353,8 @@ namespace Microsoft.Data.Entity.FunctionalTests
         {
             AssertQuery<Employee>(
                 es => from e1 in es
-                    from e2 in es
-                    select new { e1.City, e2.Country });
+                      from e2 in es
+                      select new { e1.City, e2.Country });
         }
 
         [Fact]
@@ -1362,9 +1362,9 @@ namespace Microsoft.Data.Entity.FunctionalTests
         {
             AssertQuery<Employee>(
                 es => from e1 in es
-                    from e2 in es
-                    from e3 in es
-                    select new { e1.City, e2.Country, e3.FirstName });
+                      from e2 in es
+                      from e3 in es
+                      select new { e1.City, e2.Country, e3.FirstName });
         }
 
         [Fact]
@@ -1537,9 +1537,9 @@ namespace Microsoft.Data.Entity.FunctionalTests
         {
             AssertQuery<Customer, Order>((cs, os) =>
                 (from c in cs
-                    join o in os on c.CustomerID equals o.CustomerID
-                    where c.CustomerID == "ALFKI"
-                    select c).Count());
+                 join o in os on c.CustomerID equals o.CustomerID
+                 where c.CustomerID == "ALFKI"
+                 select c).Count());
         }
 
         [Fact]
@@ -1557,9 +1557,9 @@ namespace Microsoft.Data.Entity.FunctionalTests
         {
             AssertQuery<Customer, Order>((cs, os) =>
                 (from c in cs
-                    join o in os on c.CustomerID equals o.CustomerID
-                    orderby c.CustomerID
-                    select c).Count());
+                 join o in os on c.CustomerID equals o.CustomerID
+                 orderby c.CustomerID
+                 select c).Count());
         }
 
         private class Foo
@@ -1621,8 +1621,8 @@ namespace Microsoft.Data.Entity.FunctionalTests
         {
             AssertQuery<Customer, Order>((cs, os) =>
                 (from c in cs
-                    from o in os
-                    select c.CustomerID).Count());
+                 from o in os
+                 select c.CustomerID).Count());
         }
 
         [Fact]
@@ -1630,9 +1630,9 @@ namespace Microsoft.Data.Entity.FunctionalTests
         {
             AssertQuery<Customer, Order>((cs, os) =>
                 (from c in cs
-                    from o in os
-                    orderby c.CustomerID, c.City
-                    select c).Any());
+                 from o in os
+                 orderby c.CustomerID, c.City
+                 select c).Any());
         }
 
         // TODO: Composite keys, slow..
@@ -1717,8 +1717,8 @@ namespace Microsoft.Data.Entity.FunctionalTests
         {
             AssertQuery<Customer>(
                 cs => from c in cs
-                    orderby cs.Any(c2 => c2.CustomerID == c.CustomerID)
-                    select c,
+                      orderby cs.Any(c2 => c2.CustomerID == c.CustomerID)
+                      select c,
                 entryCount: 91);
         }
 
@@ -1872,12 +1872,12 @@ namespace Microsoft.Data.Entity.FunctionalTests
             AssertQuery<Order>(os =>
                 os.GroupBy(o => o.CustomerID).Select(g =>
                     new
-                        {
-                            Sum = g.Sum(o => o.OrderID),
-                            Min = g.Min(o => o.OrderID),
-                            Max = g.Max(o => o.OrderID),
-                            Avg = g.Average(o => o.OrderID)
-                        }));
+                    {
+                        Sum = g.Sum(o => o.OrderID),
+                        Min = g.Min(o => o.OrderID),
+                        Max = g.Max(o => o.OrderID),
+                        Avg = g.Average(o => o.OrderID)
+                    }));
         }
 
         [Fact]
@@ -1886,12 +1886,12 @@ namespace Microsoft.Data.Entity.FunctionalTests
             AssertQuery<Order>(os =>
                 os.GroupBy(o => o.CustomerID, (k, g) =>
                     new
-                        {
-                            Sum = g.Sum(o => o.OrderID),
-                            Min = g.Min(o => o.OrderID),
-                            Max = g.Max(o => o.OrderID),
-                            Avg = g.Average(o => o.OrderID)
-                        }));
+                    {
+                        Sum = g.Sum(o => o.OrderID),
+                        Min = g.Min(o => o.OrderID),
+                        Max = g.Max(o => o.OrderID),
+                        Avg = g.Average(o => o.OrderID)
+                    }));
         }
 
         [Fact]
@@ -2611,8 +2611,7 @@ namespace Microsoft.Data.Entity.FunctionalTests
         public virtual void Coalesce_select()
         {
             AssertQuery<Customer>(customer => customer
-                .Select(c => new { c.CustomerID, c.CompanyName, Region = c.Region ?? "ZZ"}).OrderBy(o => o.Region),
-                entryCount: 0); // no entities to track, just dynamic types
+                .Select(c => new { c.CustomerID, c.CompanyName, Region = c.Region ?? "ZZ" }).OrderBy(o => o.Region));
         }
 
         [Fact]
@@ -2621,6 +2620,43 @@ namespace Microsoft.Data.Entity.FunctionalTests
             AssertQuery<Customer>(customer => customer
                 .OrderBy(c => c.Region == null ? "ZZ" : c.Region),
                 entryCount: 91);
+        }
+
+        // [Fact] Issue 1798
+        public virtual void Coalesce_projection()
+        {
+            AssertQuery<Customer>(customer => customer
+                .Select(c => new { c.CustomerID, c.CompanyName, Region = c.Region ?? "ZZ" }));
+        }
+
+        [Fact]
+        public virtual void Coalesce_filter()
+        {
+            AssertQuery<Customer>(customer => customer
+                .Where(c => (c.CompanyName ?? c.ContactName) == "The Big Cheese"),
+                entryCount: 1);
+        }
+
+        [Fact]
+        public virtual void Coalesce_nested_query_include()
+        {
+            using (var context = CreateContext())
+            {
+                var customers
+                    = (from c1 in context.Set<Customer>()
+
+                       from c2 in context.Set<Customer>()
+                           .Include(c => c.Orders)
+                           .Where(c => c.CustomerID == "ALFKI")
+                       orderby c2.Region ?? "ZZ"
+                       select c2)
+                        .ToList();
+
+                Assert.Equal(91, customers.Count);
+                Assert.Equal(546, customers.SelectMany(c => c.Orders).Count());
+                Assert.True(customers.SelectMany(c => c.Orders).All(o => o.Customer != null));
+                Assert.Equal(1 + 6, context.ChangeTracker.Entries().Count());
+            }
         }
 
         protected NorthwindContext CreateContext()
