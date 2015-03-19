@@ -108,7 +108,8 @@ namespace Microsoft.Data.Entity.Relational.Query.Sql
                 else
                 {
                     var nullSemanticsExpanded =
-                        new PredicateNullSemanticsExpandingVisitor().VisitExpression(selectExpression.Predicate);
+                        new PredicateNullSemanticsExpandingVisitor(_parameterValues)
+                        .VisitExpression(selectExpression.Predicate);
 
                     VisitExpression(nullSemanticsExpanded);
 
@@ -568,7 +569,7 @@ namespace Microsoft.Data.Entity.Relational.Query.Sql
                         return
                             binaryExpression.NodeType == ExpressionType.Equal
                                 ? (Expression)new IsNullExpression(columnExpression)
-                                : new IsNotNullExpression(columnExpression);
+                                : Expression.Not(new IsNullExpression(columnExpression));
                     }
                 }
             }
@@ -604,7 +605,7 @@ namespace Microsoft.Data.Entity.Relational.Query.Sql
             return isNullExpression;
         }
 
-        public virtual Expression VisitIsNotNullExpression(IsNotNullExpression isNotNullExpression)
+        public virtual Expression VisitIsNotNullExpression(IsNullExpression isNotNullExpression)
         {
             Check.NotNull(isNotNullExpression, nameof(isNotNullExpression));
 
@@ -644,10 +645,15 @@ namespace Microsoft.Data.Entity.Relational.Query.Sql
             if (unaryExpression.NodeType == ExpressionType.Not)
             {
                 var inExpression = unaryExpression.Operand as InExpression;
-
                 if (inExpression != null)
                 {
                     return VisitNotInExpression(inExpression);
+                }
+
+                var isNullExpression = unaryExpression.Operand as IsNullExpression;
+                if (isNullExpression != null)
+                {
+                    return VisitIsNotNullExpression(isNullExpression);
                 }
 
                 var isColumnOrParameterOperand = 
