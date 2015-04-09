@@ -9,6 +9,7 @@
         "EntityFramework.SqlServer": "7.0.0-*"
     },
     "compile": "..\\Shared\\*.cs",
+    "resource": "ReverseEngineering/Templates/*.cshtml",
     "frameworks": {
         "net451": { },
         "dnx451": { },
