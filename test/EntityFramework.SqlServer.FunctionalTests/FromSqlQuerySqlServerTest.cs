@@ -39,6 +39,41 @@ WHERE [c].[ContactName] LIKE '%' + 'z' + '%'",
                 Sql);
         }
 
+        [Fact]
+        public override void From_sql_queryable_columns_out_of_order()
+        {
+            base.From_sql_queryable_columns_out_of_order();
+
+            Assert.Equal(
+                @"SELECT Region, CustomerID, Address, City, CompanyName, ContactName, ContactTitle, Country, Fax, Phone, PostalCode FROM Customers
+
+SELECT OrderDate, OrderID, CustomerID FROM Orders",
+                Sql);
+        }
+
+        [Fact]
+        public override void From_sql_queryable_columns_out_of_order_composed()
+        {
+            base.From_sql_queryable_columns_out_of_order_composed();
+
+            Assert.Equal(
+                @"SELECT [c].[CustomerID], [c].[Address], [c].[City], [c].[CompanyName], [c].[ContactName], [c].[ContactTitle], [c].[Country], [c].[Fax], [c].[Phone], [c].[PostalCode], [c].[Region]
+FROM (
+    SELECT Region, CustomerID, Address, City, CompanyName, ContactName, ContactTitle, Country, Fax, Phone, PostalCode FROM Customers
+) AS [c]
+WHERE [c].[City] = 'London'
+
+__MaxValue_0: 12/31/9999 11:59:59 PM
+
+SELECT [o].[OrderID], [o].[CustomerID], [o].[OrderDate]
+FROM (
+    SELECT OrderDate, OrderID, CustomerID FROM Orders
+) AS [o]
+WHERE [o].[OrderDate] < @__MaxValue_0",
+                Sql);
+        }
+
+
         public override void From_sql_queryable_multiple_line_query()
         {
             base.From_sql_queryable_multiple_line_query();

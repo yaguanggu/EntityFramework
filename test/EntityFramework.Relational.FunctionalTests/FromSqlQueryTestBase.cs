@@ -41,6 +41,34 @@ namespace Microsoft.Data.Entity.Relational.FunctionalTests
         }
 
         [Fact]
+        public virtual void From_sql_queryable_columns_out_of_order()
+        {
+            AssertQuery<Customer>(
+                cs => cs.FromSql("SELECT Region, CustomerID, Address, City, CompanyName, ContactName, ContactTitle, Country, Fax, Phone, PostalCode FROM Customers"),
+                cs => cs,
+                entryCount: 91);
+
+            AssertQuery<Order>(
+                os => os.FromSql("SELECT OrderDate, OrderID, CustomerID FROM Orders"),
+                os => os,
+                entryCount: 830);
+        }
+
+        [Fact]
+        public virtual void From_sql_queryable_columns_out_of_order_composed()
+        {
+            AssertQuery<Customer>(
+                cs => cs.FromSql("SELECT Region, CustomerID, Address, City, CompanyName, ContactName, ContactTitle, Country, Fax, Phone, PostalCode FROM Customers").Where(c => c.City == "London"),
+                cs => cs.Where(c => c.City == "London"),
+                entryCount: 6);
+
+            AssertQuery<Order>(
+                os => os.FromSql("SELECT OrderDate, OrderID, CustomerID FROM Orders").Where(o => o.OrderDate < DateTime.MaxValue),
+                os => os.Where(o => o.OrderDate < DateTime.MaxValue),
+                entryCount: 830);
+        }
+
+        [Fact]
         public virtual void From_sql_queryable_multiple_line_query()
         {
             AssertQuery<Customer>(
