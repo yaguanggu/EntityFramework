@@ -1,11 +1,11 @@
 {
-    "version": "7.0.0-*",
+    "version": "7.0.0-beta4",
     "description":  "Microsoft SQL Server data store for Entity Framework.",
     "compilationOptions": {
         "warningsAsErrors": true
     },
     "dependencies": {
-        "EntityFramework.Relational": "7.0.0-*"
+        "EntityFramework.Relational": "7.0.0-beta4"
     },
     "compile": "..\\Shared\\*.cs",
     "frameworks": {

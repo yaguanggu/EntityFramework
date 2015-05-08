@@ -1,12 +1,12 @@
 {
-    "version": "7.0.0-*",
+    "version": "7.0.0-beta4",
     "description":  "Shared Design-time Entity Framework components for relational data stores.",
     "compilationOptions": {
         "warningsAsErrors": true
     },
     "dependencies": {
-        "EntityFramework.Core": "7.0.0-*",
-        "EntityFramework.Relational": "7.0.0-*"
+        "EntityFramework.Core": "7.0.0-beta4",
+        "EntityFramework.Relational": "7.0.0-beta4"
     },
     "compile": "..\\Shared\\*.cs",
     "frameworks": {

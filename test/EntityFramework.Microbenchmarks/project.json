@@ -1,9 +1,9 @@
 {
     "dependencies": {
-        "EntityFramework.SqlServer": "7.0.0-*",
-        "EntityFramework.Microbenchmarks.Core": "1.0.0-*",
-        "Microsoft.Framework.ConfigurationModel.Json": "1.0.0-*",
-        "Microsoft.Framework.ConfigurationModel.Xml": "1.0.0-*",
+        "EntityFramework.SqlServer": "7.0.0-beta4",
+        "EntityFramework.Microbenchmarks.Core": "1.0.0-beta4",
+        "Microsoft.Framework.ConfigurationModel.Json": "1.0.0-beta4",
+        "Microsoft.Framework.ConfigurationModel.Xml": "1.0.0-beta4",
         "xunit.runner.aspnet": "2.0.0-aspnet-*"
     },
     "commands": {

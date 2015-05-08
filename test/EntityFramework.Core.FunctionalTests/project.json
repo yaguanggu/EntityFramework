@@ -1,7 +1,7 @@
 {
     "dependencies": {
         "EntityFramework.Core.Tests": "1.0.0",
-        "EntityFramework.InMemory": "7.0.0-*",
+        "EntityFramework.InMemory": "7.0.0-beta4",
         "xunit.runner.aspnet": "2.0.0-aspnet-*"
     },
     "commands": {
