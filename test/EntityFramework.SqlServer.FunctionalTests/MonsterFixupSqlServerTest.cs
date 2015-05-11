@@ -40,21 +40,9 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
         protected override DbContextOptions CreateOptions(string databaseName)
         {
             var optionsBuilder = new DbContextOptionsBuilder();
-            optionsBuilder.UseSqlServer(CreateConnectionString(databaseName));
+            SqlServerTestStore.ConfigureDbContext(optionsBuilder, databaseName);
 
             return optionsBuilder.Options;
-        }
-
-        private static string CreateConnectionString(string name)
-        {
-            return new SqlConnectionStringBuilder
-                {
-                    DataSource = @"(localdb)\MSSQLLocalDB",
-                    MultipleActiveResultSets = true,
-                    InitialCatalog = name,
-                    IntegratedSecurity = true,
-                    ConnectTimeout = 30
-                }.ConnectionString;
         }
 
         protected override async Task CreateAndSeedDatabase(string databaseName, Func<MonsterContext> createContext)

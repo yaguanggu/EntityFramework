@@ -516,7 +516,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
             protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             {
-                optionsBuilder.UseSqlServer(SqlServerNorthwindContext.ConnectionString);
+                SqlServerTestStore.ConfigureDbContext(optionsBuilder, SqlServerNorthwindContext.DatabaseName);
             }
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)

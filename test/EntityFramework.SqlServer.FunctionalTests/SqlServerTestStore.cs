@@ -46,7 +46,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
             return new SqlServerTestStore(name).CreateTransient(createDatabase);
         }
 
-        private SqlConnection _connection;
+        private SqlServerTestConnection _connection;
         private SqlTransaction _transaction;
         private readonly string _name;
         private bool _deleteDatabase;
@@ -198,7 +198,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
             }
         }
 
-        private static async Task WaitForExistsAsync(SqlConnection connection)
+        private static async Task WaitForExistsAsync(SqlServerTestConnection connection)
         {
             var retryCount = 0;
             while (true)
@@ -219,14 +219,14 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
                         throw;
                     }
 
-                    SqlConnection.ClearPool(connection);
+                    connection.ClearPool();
 
                     Thread.Sleep(100);
                 }
             }
         }
 
-        private static void WaitForExists(SqlConnection connection)
+        private static void WaitForExists(SqlServerTestConnection connection)
         {
             var retryCount = 0;
             while (true)
@@ -247,7 +247,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
                         throw;
                     }
 
-                    SqlConnection.ClearPool(connection);
+                    connection.ClearPool();
 
                     Thread.Sleep(100);
                 }
@@ -285,11 +285,11 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
         {
             DeleteDatabase(_name);
 
-            _connection = new SqlConnection(CreateConnectionString(_name));
+            _connection = CreateConnection(_name);
 
             if (createDatabase)
             {
-                using (var master = new SqlConnection(CreateConnectionString("master")))
+                using (var master = CreateConnection("master"))
                 {
                     master.Open();
                     using (var command = master.CreateCommand())
@@ -310,7 +310,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
         private async Task DeleteDatabaseAsync(string name)
         {
-            using (var master = new SqlConnection(CreateConnectionString("master")))
+            using (var master = CreateConnection("master"))
             {
                 await master.OpenAsync();
 
@@ -350,7 +350,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
         private void DeleteDatabase(string name)
         {
-            using (var master = new SqlConnection(CreateConnectionString("master")))
+            using (var master = CreateConnection("master"))
             {
                 master.Open();
 
@@ -388,19 +388,13 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
             }
         }
 
-        public override DbConnection Connection
-        {
-            get { return _connection; }
-        }
+        public override DbConnection Connection => _connection;
 
-        public override DbTransaction Transaction
-        {
-            get { return _transaction; }
-        }
+        public override DbTransaction Transaction => _transaction;
 
         public async Task<T> ExecuteScalarAsync<T>(string sql, CancellationToken cancellationToken, params object[] parameters)
         {
-            using (var command = CreateCommand(sql, parameters))
+            using (var command = _connection.CreateCommand(sql, parameters, _transaction))
             {
                 return (T)await command.ExecuteScalarAsync(cancellationToken);
             }
@@ -408,7 +402,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
         public int ExecuteNonQuery(string sql, params object[] parameters)
         {
-            using (var command = CreateCommand(sql, parameters))
+            using (var command = _connection.CreateCommand(sql, parameters, _transaction))
             {
                 return command.ExecuteNonQuery();
             }
@@ -416,7 +410,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
         public Task<int> ExecuteNonQueryAsync(string sql, params object[] parameters)
         {
-            using (var command = CreateCommand(sql, parameters))
+            using (var command = _connection.CreateCommand(sql, parameters, _transaction))
             {
                 return command.ExecuteNonQueryAsync();
             }
@@ -424,7 +418,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
         public async Task<IEnumerable<T>> QueryAsync<T>(string sql, params object[] parameters)
         {
-            using (var command = CreateCommand(sql, parameters))
+            using (var command = _connection.CreateCommand(sql, parameters, _transaction))
             {
                 using (var dataReader = await command.ExecuteReaderAsync())
                 {
@@ -440,32 +434,9 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
             }
         }
 
-        private DbCommand CreateCommand(string commandText, object[] parameters)
-        {
-            var command = _connection.CreateCommand();
-
-            if (_transaction != null)
-            {
-                command.Transaction = _transaction;
-            }
-
-            command.CommandText = commandText;
-            command.CommandTimeout = CommandTimeout;
-
-            for (var i = 0; i < parameters.Length; i++)
-            {
-                command.Parameters.AddWithValue("p" + i, parameters[i]);
-            }
-
-            return command;
-        }
-
         public override void Dispose()
         {
-            if (_transaction != null)
-            {
-                _transaction.Dispose();
-            }
+            _transaction?.Dispose();
 
             _connection.Dispose();
 
@@ -475,19 +446,14 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
             }
         }
 
-        public static string CreateConnectionString(string name)
-        {
-            return new SqlConnectionStringBuilder
-                {
-                    DataSource = @"(localdb)\MSSQLLocalDB",
-                    // TODO: Currently nested queries are run while processing the results of outer queries
-                    // This either requires MARS or creation of a new connection for each query. Currently using
-                    // MARS since cloning connections is known to be problematic.
-                    MultipleActiveResultSets = true,
-                    InitialCatalog = name,
-                    IntegratedSecurity = true,
-                    ConnectTimeout = 30
-                }.ConnectionString;
-        }
+        public static void ConfigureDbContext(DbContextOptionsBuilder optionsBuilder, string dataStore)
+            => optionsBuilder
+                .UseSqlServer(SqlServerTestConfiguration.CreateConnectionString(dataStore))
+                .CommandTimeout(SqlServerTestConfiguration.CommandTimeout);
+
+        public static SqlServerTestConnection CreateConnection(string dataStore)
+            => new SqlServerTestConnection(
+                SqlServerTestConfiguration.CreateConnectionString(dataStore),
+                SqlServerTestConfiguration.CommandTimeout);
     }
 }

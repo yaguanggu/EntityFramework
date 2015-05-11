@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using Microsoft.Data.Entity.Infrastructure;
@@ -50,7 +51,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
         {
             protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             {
-                optionsBuilder.UseSqlServer(SqlServerNorthwindContext.ConnectionString);
+                SqlServerTestStore.ConfigureDbContext(optionsBuilder, SqlServerNorthwindContext.DatabaseName);
             }
         }
 
@@ -59,7 +60,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection
-                .AddScoped(p => new SqlConnection(SqlServerNorthwindContext.ConnectionString))
+                .AddScoped(p => SqlServerTestStore.CreateConnection(SqlServerNorthwindContext.DatabaseName))
                 .AddEntityFramework()
                 .AddSqlServer()
                 .AddDbContext<ConnectionInOnConfiguringContext>();
@@ -80,7 +81,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
         {
             using (SqlServerNorthwindContext.GetSharedStore())
             {
-                using (var context = new ConnectionInOnConfiguringContext(new SqlConnection(SqlServerNorthwindContext.ConnectionString)))
+                using (var context = new ConnectionInOnConfiguringContext(SqlServerTestStore.CreateConnection(SqlServerNorthwindContext.DatabaseName)))
                 {
                     Assert.True(context.Customers.Any());
                 }
@@ -89,9 +90,9 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
         private class ConnectionInOnConfiguringContext : NorthwindContextBase
         {
-            private readonly SqlConnection _connection;
+            private readonly DbConnection _connection;
 
-            public ConnectionInOnConfiguringContext(SqlConnection connection)
+            public ConnectionInOnConfiguringContext(DbConnection connection)
             {
                 _connection = connection;
             }
@@ -244,7 +245,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
             {
                 if (UseSqlServer)
                 {
-                    optionsBuilder.UseSqlServer(SqlServerNorthwindContext.ConnectionString);
+                    SqlServerTestStore.ConfigureDbContext(optionsBuilder, SqlServerNorthwindContext.DatabaseName);
                 }
                 else
                 {
@@ -268,7 +269,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection
-                .AddScoped(p => new SqlConnection(SqlServerNorthwindContext.ConnectionString))
+                .AddScoped(p => SqlServerTestStore.CreateConnection(SqlServerNorthwindContext.DatabaseName))
                 .AddEntityFramework()
                 .AddSqlServer()
                 .AddDbContext<OptionsContext>();
@@ -291,7 +292,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
             {
                 using (var context = new OptionsContext(
                     new DbContextOptions<OptionsContext>(),
-                    new SqlConnection(SqlServerNorthwindContext.ConnectionString)))
+                    SqlServerTestStore.CreateConnection(SqlServerNorthwindContext.DatabaseName)))
                 {
                     Assert.True(context.Customers.Any());
                 }
@@ -300,10 +301,10 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
         private class OptionsContext : NorthwindContextBase
         {
-            private readonly SqlConnection _connection;
+            private readonly DbConnection _connection;
             private readonly DbContextOptions<OptionsContext> _options;
 
-            public OptionsContext(DbContextOptions<OptionsContext> options, SqlConnection connection)
+            public OptionsContext(DbContextOptions<OptionsContext> options, DbConnection connection)
                 : base(options)
             {
                 _options = options;
@@ -384,7 +385,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
             {
                 Assert.Same(_options, optionsBuilder.Options);
 
-                optionsBuilder.UseSqlServer(SqlServerNorthwindContext.ConnectionString);
+                SqlServerTestStore.ConfigureDbContext(optionsBuilder, SqlServerNorthwindContext.DatabaseName);
 
                 Assert.NotSame(_options, optionsBuilder.Options);
             }
@@ -457,7 +458,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
             {
                 Assert.Same(_options, optionsBuilder.Options);
 
-                optionsBuilder.UseSqlServer(SqlServerNorthwindContext.ConnectionString);
+                SqlServerTestStore.ConfigureDbContext(optionsBuilder, SqlServerNorthwindContext.DatabaseName);
 
                 Assert.NotSame(_options, optionsBuilder.Options);
             }

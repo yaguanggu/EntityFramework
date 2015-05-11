@@ -36,7 +36,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
                 return SqlServerTestStore.GetOrCreateShared(DatabaseName, () =>
                     {
                         var optionsBuilder = new DbContextOptionsBuilder();
-                        optionsBuilder.UseSqlServer(SqlServerTestStore.CreateConnectionString(DatabaseName));
+                        SqlServerTestStore.ConfigureDbContext(optionsBuilder, DatabaseName);
 
                         using (var context = new GraphUpdatesContext(_serviceProvider, optionsBuilder.Options))
                         {

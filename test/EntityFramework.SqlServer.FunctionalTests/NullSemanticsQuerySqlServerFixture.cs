@@ -17,8 +17,6 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
         private readonly IServiceProvider _serviceProvider;
 
-        private readonly string _connectionString = SqlServerTestStore.CreateConnectionString(DatabaseName);
-
         public NullSemanticsQuerySqlServerFixture()
         {
             _serviceProvider = new ServiceCollection()
@@ -35,7 +33,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
             return SqlServerTestStore.GetOrCreateShared(DatabaseName, () =>
             {
                 var optionsBuilder = new DbContextOptionsBuilder();
-                optionsBuilder.UseSqlServer(_connectionString);
+                SqlServerTestStore.ConfigureDbContext(optionsBuilder, DatabaseName);
 
                 using (var context = new NullSemanticsContext(_serviceProvider, optionsBuilder.Options))
                 {

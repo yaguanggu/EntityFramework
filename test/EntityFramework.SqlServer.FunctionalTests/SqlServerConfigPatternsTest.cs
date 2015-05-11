@@ -34,7 +34,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
                 protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
                 {
-                    optionsBuilder.UseSqlServer(SqlServerNorthwindContext.ConnectionString);
+                    SqlServerTestStore.ConfigureDbContext(optionsBuilder, SqlServerNorthwindContext.DatabaseName);
                 }
 
                 protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -52,7 +52,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
                 using (await SqlServerNorthwindContext.GetSharedStoreAsync())
                 {
                     var optionsBuilder = new DbContextOptionsBuilder();
-                    optionsBuilder.UseSqlServer(SqlServerNorthwindContext.ConnectionString);
+                    SqlServerTestStore.ConfigureDbContext(optionsBuilder, SqlServerNorthwindContext.DatabaseName);
 
                     using (var context = new NorthwindContext(optionsBuilder.Options))
                     {
@@ -109,7 +109,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
                 protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
                 {
-                    optionsBuilder.UseSqlServer(SqlServerNorthwindContext.ConnectionString);
+                    SqlServerTestStore.ConfigureDbContext(optionsBuilder, SqlServerNorthwindContext.DatabaseName);
                 }
 
                 protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -134,7 +134,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
                     var serviceProvider = serviceCollection.BuildServiceProvider();
 
                     var optionsBuilder = new DbContextOptionsBuilder();
-                    optionsBuilder.UseSqlServer(SqlServerNorthwindContext.ConnectionString);
+                    SqlServerTestStore.ConfigureDbContext(optionsBuilder, SqlServerNorthwindContext.DatabaseName);
 
                     using (var context = new NorthwindContext(serviceProvider, optionsBuilder.Options))
                     {
@@ -267,7 +267,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
                 protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
                 {
-                    optionsBuilder.UseSqlServer(SqlServerNorthwindContext.ConnectionString);
+                    SqlServerTestStore.ConfigureDbContext(optionsBuilder, SqlServerNorthwindContext.DatabaseName);
                 }
 
                 protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -327,7 +327,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
                 protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
                 {
-                    optionsBuilder.UseSqlServer(SqlServerNorthwindContext.ConnectionString);
+                    SqlServerTestStore.ConfigureDbContext(optionsBuilder, SqlServerNorthwindContext.DatabaseName);
                 }
 
                 protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -343,7 +343,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
             public async Task Can_register_context_and_configuration_with_DI_container_and_have_both_injected()
             {
                 var optionsBuilder = new DbContextOptionsBuilder();
-                optionsBuilder.UseSqlServer(SqlServerNorthwindContext.ConnectionString);
+                SqlServerTestStore.ConfigureDbContext(optionsBuilder, SqlServerNorthwindContext.DatabaseName);
 
                 var serviceCollection = new ServiceCollection();
                 serviceCollection
@@ -406,7 +406,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
             public async Task Can_register_configuration_with_DI_container_and_have_it_injected()
             {
                 var optionsBuilder = new DbContextOptionsBuilder();
-                optionsBuilder.UseSqlServer(SqlServerNorthwindContext.ConnectionString);
+                SqlServerTestStore.ConfigureDbContext(optionsBuilder, SqlServerNorthwindContext.DatabaseName);
 
                 var serviceCollection = new ServiceCollection();
                 serviceCollection
@@ -467,7 +467,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
                 using (await SqlServerNorthwindContext.GetSharedStoreAsync())
                 {
                     var optionsBuilder = new DbContextOptionsBuilder();
-                    optionsBuilder.UseSqlServer(SqlServerNorthwindContext.ConnectionString);
+                    SqlServerTestStore.ConfigureDbContext(optionsBuilder, SqlServerNorthwindContext.DatabaseName);
 
                     using (var context = new NorthwindContext(optionsBuilder.Options))
                     {
@@ -499,7 +499,9 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
             {
                 using (await SqlServerNorthwindContext.GetSharedStoreAsync())
                 {
-                    using (var context = new NorthwindContext(SqlServerNorthwindContext.ConnectionString))
+                    var connection = SqlServerTestStore.CreateConnection(SqlServerNorthwindContext.DatabaseName);
+
+                    using (var context = new NorthwindContext(connection.ConnectionString))
                     {
                         Assert.Equal(91, await context.Customers.CountAsync());
                     }
@@ -580,7 +582,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
                 protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
                 {
-                    optionsBuilder.UseSqlServer(SqlServerNorthwindContext.ConnectionString);
+                    SqlServerTestStore.ConfigureDbContext(optionsBuilder, SqlServerNorthwindContext.DatabaseName);
                 }
             }
         }
@@ -686,7 +688,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
                 protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
                 {
-                    optionsBuilder.UseSqlServer(SqlServerNorthwindContext.ConnectionString);
+                    SqlServerTestStore.ConfigureDbContext(optionsBuilder, SqlServerNorthwindContext.DatabaseName);
                 }
             }
         }

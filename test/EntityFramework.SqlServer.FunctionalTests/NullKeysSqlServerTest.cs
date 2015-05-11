@@ -30,7 +30,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
                     .BuildServiceProvider();
 
                 var optionsBuilder = new DbContextOptionsBuilder();
-                optionsBuilder.UseSqlServer(SqlServerTestStore.CreateConnectionString("StringsContext"));
+                SqlServerTestStore.ConfigureDbContext(optionsBuilder, "StringsContext");
                 _options = optionsBuilder.Options;
 
                 EnsureCreated();

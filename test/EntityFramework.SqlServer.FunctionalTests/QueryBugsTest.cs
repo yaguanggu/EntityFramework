@@ -23,11 +23,10 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
             Action<TContext> contextInitializer)
             where TContext : DbContext, IDisposable
         {
-            var connectionString = SqlServerTestStore.CreateConnectionString(databaseName);
             SqlServerTestStore.GetOrCreateShared(databaseName, () =>
                 {
                     var optionsBuilder = new DbContextOptionsBuilder();
-                    optionsBuilder.UseSqlServer(connectionString);
+                    SqlServerTestStore.ConfigureDbContext(optionsBuilder, databaseName);
 
                     using (var context = contextCreator(serviceProvider, optionsBuilder.Options))
                     {
@@ -98,7 +97,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
             protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             {
-                optionsBuilder.UseSqlServer(SqlServerTestStore.CreateConnectionString("Repro603"));
+                SqlServerTestStore.ConfigureDbContext(optionsBuilder, "Repro603");
             }
         }
 
@@ -224,7 +223,7 @@ LEFT JOIN [Customer] AS [c] ON ([o].[CustomerFirstName] = [c].[FirstName] AND [o
 
             protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             {
-                optionsBuilder.UseSqlServer(SqlServerTestStore.CreateConnectionString("Repro925"));
+                SqlServerTestStore.ConfigureDbContext(optionsBuilder, "Repro925");
             }
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -362,7 +361,7 @@ Queen of the Andals and the Rhoynar and the First Men, Khaleesi of the Great Gra
 
             protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             {
-                optionsBuilder.UseSqlServer(SqlServerTestStore.CreateConnectionString("Repro963"));
+                SqlServerTestStore.ConfigureDbContext(optionsBuilder, "Repro963");
             }
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -1,0 +1,8 @@
+﻿{
+  "EF": {
+    "SqlServer": {
+      "CommandTimeout": 30,
+      "ConnectionString": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog={0};Integrated Security=True;MultipleActiveResultSets=True;Connect Timeout=30"
+    }
+  }
+}
