@@ -16,8 +16,6 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 {
     public class SqlServerTestStore : RelationalTestStore
     {
-        public const int CommandTimeout = 30;
-
         private static int _scratchCount;
 
         public static Task<SqlServerTestStore> GetOrCreateSharedAsync(string name, Func<Task> initializeDatabase)
@@ -61,7 +59,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
         {
             await CreateSharedAsync(typeof(SqlServerTestStore).Name + _name, initializeDatabase);
 
-            _connection = new SqlConnection(CreateConnectionString(_name));
+            _connection = CreateConnection(_name);
 
             await _connection.OpenAsync();
 
@@ -74,7 +72,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
         {
             CreateShared(typeof(SqlServerTestStore).Name + _name, initializeDatabase);
 
-            _connection = new SqlConnection(CreateConnectionString(_name));
+            _connection = CreateConnection(_name);
 
             _connection.Open();
 
@@ -85,13 +83,13 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
         public static async Task CreateDatabaseIfNotExistsAsync(string name, string scriptPath = null)
         {
-            using (var master = new SqlConnection(CreateConnectionString("master")))
+            using (var master = CreateConnection("master"))
             {
                 await master.OpenAsync();
 
                 using (var command = master.CreateCommand())
                 {
-                    command.CommandTimeout = CommandTimeout;
+                    command.CommandTimeout = SqlServerTestConfiguration.CommandTimeout;
                     command.CommandText
                         = $@"SELECT COUNT(*) FROM sys.databases WHERE name = N'{name}'";
 
@@ -105,7 +103,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
                             await command.ExecuteNonQueryAsync();
 
-                            using (var newConnection = new SqlConnection(CreateConnectionString(name)))
+                            using (var newConnection = CreateConnection(name))
                             {
                                 await WaitForExistsAsync(newConnection);
                             }
@@ -143,13 +141,13 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
         public static void CreateDatabaseIfNotExists(string name, string scriptPath = null)
         {
-            using (var master = new SqlConnection(CreateConnectionString("master")))
+            using (var master = CreateConnection("master"))
             {
                 master.Open();
 
                 using (var command = master.CreateCommand())
                 {
-                    command.CommandTimeout = CommandTimeout;
+                    command.CommandTimeout = SqlServerTestConfiguration.CommandTimeout;
                     command.CommandText = $@"SELECT COUNT(*) FROM sys.databases WHERE name = N'{name}'";
 
                     var exists = (int)command.ExecuteScalar() > 0;
@@ -162,7 +160,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
                             command.ExecuteNonQuery();
 
-                            using (var newConnection = new SqlConnection(CreateConnectionString(name)))
+                            using (var newConnection = CreateConnection(name))
                             {
                                 WaitForExists(newConnection);
                             }
@@ -258,11 +256,11 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
         {
             await DeleteDatabaseAsync(_name);
 
-            _connection = new SqlConnection(CreateConnectionString(_name));
+            _connection = CreateConnection(_name);
 
             if (createDatabase)
             {
-                using (var master = new SqlConnection(CreateConnectionString("master")))
+                using (var master = CreateConnection("master"))
                 {
                     await master.OpenAsync();
                     using (var command = master.CreateCommand())
@@ -316,7 +314,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
                 using (var command = master.CreateCommand())
                 {
-                    command.CommandTimeout = CommandTimeout; // Query will take a few seconds if (and only if) there are active connections
+                    command.CommandTimeout = SqlServerTestConfiguration.CommandTimeout; // Query will take a few seconds if (and only if) there are active connections
 
                     // SET SINGLE_USER will close any open connections that would prevent the drop
                     command.CommandText
@@ -356,7 +354,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
                 using (var command = master.CreateCommand())
                 {
-                    command.CommandTimeout = CommandTimeout; // Query will take a few seconds if (and only if) there are active connections
+                    command.CommandTimeout = SqlServerTestConfiguration.CommandTimeout; // Query will take a few seconds if (and only if) there are active connections
 
                     // SET SINGLE_USER will close any open connections that would prevent the drop
                     command.CommandText

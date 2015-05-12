@@ -27,7 +27,7 @@ namespace Microsoft.Data.Entity.SqlServer.FunctionalTests
 
             var configuration = new Configuration(applicationBasePath);
 
-#if true
+#if false
             configuration.AddJsonFile(@"..\..\..\EntityFramework.SqlServer.FunctionalTests\config.json");
 #else
             configuration.AddJsonFile(@"..\EntityFramework.SqlServer.FunctionalTests\config.json");
