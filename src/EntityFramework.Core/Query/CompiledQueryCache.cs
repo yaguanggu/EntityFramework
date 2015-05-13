@@ -23,6 +23,8 @@ using Remotion.Linq.Parsing.ExpressionTreeVisitors.TreeEvaluation;
 using Remotion.Linq.Parsing.Structure;
 using Remotion.Linq.Parsing.Structure.ExpressionTreeProcessors;
 using Remotion.Linq.Parsing.Structure.NodeTypeProviders;
+using Remotion.Linq.Clauses.Expressions;
+using Remotion.Linq.Parsing;
 
 namespace Microsoft.Data.Entity.Query
 {
@@ -56,6 +58,10 @@ namespace Microsoft.Data.Entity.Query
                 = GetOrAdd(query, queryContext, dataStore, isAsync: false, compiler: (q, ds) =>
                     {
                         var queryModel = CreateQueryParser().GetParsedQuery(q);
+                        queryModel.TransformExpressions(e =>
+                            e != null && e.CanReduce
+                            ? e.Reduce()
+                            : e);
 
                         var streamedSequenceInfo
                             = queryModel.GetOutputDataInfo() as StreamedSequenceInfo;
@@ -165,10 +171,12 @@ namespace Microsoft.Data.Entity.Query
         {
             public static Expression ExtractParameters(Expression expressionTree, QueryContext queryContext)
             {
-                var partialEvaluationInfo = EvaluatableTreeFindingExpressionTreeVisitor.Analyze(expressionTree);
+                var methodEvaluationDisabledExpression = new MethodEvaluationDisablingVisitor().VisitExpression(expressionTree);
+
+                var partialEvaluationInfo = EvaluatableTreeFindingExpressionTreeVisitor.Analyze(methodEvaluationDisabledExpression);
                 var visitor = new ParameterExtractingExpressionTreeVisitor(partialEvaluationInfo, queryContext);
 
-                return visitor.VisitExpression(expressionTree);
+                return visitor.VisitExpression(methodEvaluationDisabledExpression);
             }
 
             private readonly PartialEvaluationInfo _partialEvaluationInfo;
@@ -337,6 +345,55 @@ namespace Microsoft.Data.Entity.Query
                         Expression.Convert(expression, typeof(object)))
                         .Compile()
                         .Invoke();
+            }
+
+            private class MethodEvaluationDisablingVisitor : ExpressionTreeVisitorBase
+            {
+                protected override Expression VisitMethodCallExpression(MethodCallExpression expression)
+                {
+                    return IsQueryable(expression.Object) || IsQueryable(expression.Arguments.FirstOrDefault())
+                        ? base.VisitMethodCallExpression(expression)
+                        : new EvaluationPreventingExpression(expression);
+                }
+
+                private bool IsQueryable(Expression expression)
+                {
+                    if (expression == null)
+                    {
+                        return false;
+                    }
+
+                    return typeof(IQueryable).GetTypeInfo().IsAssignableFrom(expression.Type.GetTypeInfo());
+                }
+            }
+
+            private class EvaluationPreventingExpression : ExtensionExpression
+            {
+                public Expression Argument { get; private set; }
+
+                public EvaluationPreventingExpression(Expression argument)
+                    : base(argument.Type)
+                {
+                    Argument = argument;
+                }
+
+                public override bool CanReduce
+                {
+                    get
+                    {
+                        return true;
+                    }
+                }
+
+                public override Expression Reduce()
+                {
+                    return Argument;
+                }
+
+                protected override Expression VisitChildren(ExpressionTreeVisitor visitor)
+                {
+                    return this;
+                }
             }
         }
 

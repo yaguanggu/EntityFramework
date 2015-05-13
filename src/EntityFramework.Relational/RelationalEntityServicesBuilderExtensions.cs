@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Internal;
 using Microsoft.Data.Entity.Relational.Migrations;
@@ -13,6 +12,8 @@ using Microsoft.Data.Entity.Relational.Update;
 using Microsoft.Data.Entity.Relational.ValueGeneration;
 using Microsoft.Data.Entity.Utilities;
 using Microsoft.Framework.DependencyInjection;
+using Microsoft.Data.Entity.Relational.Query.Methods;
+using JetBrains.Annotations;
 
 // Intentionally in this namespace since this is for use by other relational providers rather than
 // by top-level app developers.
@@ -25,7 +26,7 @@ namespace Microsoft.Data.Entity.Relational
         {
             Check.NotNull(builder, nameof(builder));
 
-            ((IAccessor<IServiceCollection>)builder).Service.TryAdd(new ServiceCollection()
+            ((IAccessor<IServiceCollection>)builder).Service
                 .AddSingleton<IParameterNameGeneratorFactory, ParameterNameGeneratorFactory>()
                 .AddSingleton<IComparer<ModificationCommand>, ModificationCommandComparer>()
                 .AddSingleton<IMigrationIdGenerator, MigrationIdGenerator>()
@@ -39,6 +40,7 @@ namespace Microsoft.Data.Entity.Relational
                 .AddScoped<ModelDiffer>()
                 .AddScoped<RelationalDatabaseFactory>()
                 .AddScoped<RelationalValueGeneratorSelector>()
+                .AddScoped<IRelationalMethodCallTranslatorProvider, RelationalMethodCallTranslatorProvider>()
                 .AddScoped(p => GetStoreServices(p).ModelDiffer)
                 .AddScoped(p => GetStoreServices(p).HistoryRepository)
                 .AddScoped(p => GetStoreServices(p).MigrationSqlGenerator)
@@ -49,7 +51,7 @@ namespace Microsoft.Data.Entity.Relational
                 .AddScoped(p => GetStoreServices(p).BatchExecutor)
                 .AddScoped(p => GetStoreServices(p).ValueBufferFactoryFactory)
                 .AddScoped(p => GetStoreServices(p).RelationalDataStoreCreator)
-                .AddScoped(p => GetStoreServices(p).SqlGenerator));
+                .AddScoped(p => GetStoreServices(p).SqlGenerator);
 
             return builder;
         }

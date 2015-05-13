@@ -27,6 +27,7 @@ namespace Microsoft.Data.Entity.Relational
         private readonly IBatchExecutor _batchExecutor;
         private readonly IRelationalConnection _connection;
         private readonly IDbContextOptions _options;
+        private readonly IRelationalMethodCallTranslatorProvider _methodCallTranslatorProvider;
 
         protected RelationalDataStore(
             [NotNull] IModel model,
@@ -38,7 +39,8 @@ namespace Microsoft.Data.Entity.Relational
             [NotNull] IBatchExecutor batchExecutor,
             [NotNull] IDbContextOptions options,
             [NotNull] ILoggerFactory loggerFactory,
-            [NotNull] IRelationalValueBufferFactoryFactory valueBufferFactoryFactory)
+            [NotNull] IRelationalValueBufferFactoryFactory valueBufferFactoryFactory,
+            [NotNull] IRelationalMethodCallTranslatorProvider methodCallTranslatorProvider)
             : base(
                 Check.NotNull(model, nameof(model)),
                 Check.NotNull(entityKeyFactorySource, nameof(entityKeyFactorySource)),
@@ -52,11 +54,13 @@ namespace Microsoft.Data.Entity.Relational
             Check.NotNull(options, nameof(options));
             Check.NotNull(options, nameof(options));
             Check.NotNull(valueBufferFactoryFactory, nameof(valueBufferFactoryFactory));
+            Check.NotNull(methodCallTranslatorProvider, nameof(methodCallTranslatorProvider));
 
             _batchPreparer = batchPreparer;
             _batchExecutor = batchExecutor;
             _connection = connection;
             _options = options;
+            _methodCallTranslatorProvider = methodCallTranslatorProvider;
 
             ValueBufferFactoryFactory = valueBufferFactoryFactory;
         }
@@ -86,7 +90,7 @@ namespace Microsoft.Data.Entity.Relational
                 new LinqOperatorProvider(),
                 new RelationalResultOperatorHandler(),
                 new QueryMethodProvider(),
-                new CompositeMethodCallTranslator(Logger))
+                _methodCallTranslatorProvider)
                 .CreateQueryModelVisitor()
                 .CreateQueryExecutor<TResult>(
                     Check.NotNull(queryModel, nameof(queryModel)));
@@ -96,7 +100,7 @@ namespace Microsoft.Data.Entity.Relational
                 new AsyncLinqOperatorProvider(),
                 new RelationalResultOperatorHandler(),
                 new AsyncQueryMethodProvider(),
-                new CompositeMethodCallTranslator(Logger))
+                _methodCallTranslatorProvider)
                 .CreateQueryModelVisitor()
                 .CreateAsyncQueryExecutor<TResult>(
                     Check.NotNull(queryModel, nameof(queryModel)));
@@ -105,7 +109,7 @@ namespace Microsoft.Data.Entity.Relational
             [NotNull] ILinqOperatorProvider linqOperatorProvider,
             [NotNull] IResultOperatorHandler resultOperatorHandler,
             [NotNull] IQueryMethodProvider queryMethodProvider,
-            [NotNull] IMethodCallTranslator methodCallTranslator)
+            [NotNull] IRelationalMethodCallTranslatorProvider methodCallTranslatorProvider)
             => new RelationalQueryCompilationContext(
                 Model,
                 Logger,
@@ -115,7 +119,7 @@ namespace Microsoft.Data.Entity.Relational
                 EntityKeyFactorySource,
                 ClrPropertyGetterSource,
                 Check.NotNull(queryMethodProvider, nameof(queryMethodProvider)),
-                Check.NotNull(methodCallTranslator, nameof(methodCallTranslator)),
+                Check.NotNull(methodCallTranslatorProvider, nameof(methodCallTranslatorProvider)),
                 ValueBufferFactoryFactory);
     }
 }

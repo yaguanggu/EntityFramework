@@ -205,7 +205,7 @@ namespace Microsoft.Data.Entity.Relational.Query.ExpressionTreeVisitors
 
             var operand = VisitExpression(methodCallExpression.Object);
 
-            if (operand != null)
+            if (operand != null || methodCallExpression.Object == null)
             {
                 var arguments
                     = methodCallExpression.Arguments
@@ -215,14 +215,18 @@ namespace Microsoft.Data.Entity.Relational.Query.ExpressionTreeVisitors
 
                 if (arguments.Length == methodCallExpression.Arguments.Count)
                 {
-                    var boundExpression
-                        = Expression.Call(
-                            operand,
-                            methodCallExpression.Method,
-                            arguments);
+                    var boundExpression = operand != null
+                        ? Expression.Call(operand, methodCallExpression.Method, arguments)
+                        : Expression.Call(methodCallExpression.Method, arguments);
 
-                    return _queryModelVisitor.QueryCompilationContext.MethodCallTranslator
-                        .Translate(boundExpression);
+                    foreach (var methodCallTranslator in _queryModelVisitor.QueryCompilationContext.MethodCallTranslatorProvider.MethodCallTranslators)
+                    {
+                        var translatedMethodCall = methodCallTranslator.Translate(boundExpression);
+                        if (translatedMethodCall != null)
+                        {
+                            return translatedMethodCall;
+                        }
+                    }
                 }
             }
             else

@@ -34,6 +34,7 @@ namespace Microsoft.Data.Entity.SqlServer
         public override IRelationalDataStoreCreator RelationalDataStoreCreator => GetService<SqlServerDataStoreCreator>();
         public override IModelBuilderFactory ModelBuilderFactory => GetService<SqlServerModelBuilderFactory>();
         public override IModelDiffer ModelDiffer => GetService<SqlServerModelDiffer>();
+
         public override IHistoryRepository HistoryRepository => GetService<SqlServerHistoryRepository>();
         public override IMigrationSqlGenerator MigrationSqlGenerator => GetService<SqlServerMigrationSqlGenerator>();
         public override IModelSource ModelSource => GetService<SqlServerModelSource>();
@@ -43,5 +44,7 @@ namespace Microsoft.Data.Entity.SqlServer
         public override IModificationCommandBatchFactory ModificationCommandBatchFactory => GetService<SqlServerModificationCommandBatchFactory>();
         public override ICommandBatchPreparer CommandBatchPreparer => GetService<SqlServerCommandBatchPreparer>();
         public override IRelationalValueBufferFactoryFactory ValueBufferFactoryFactory => GetService<UntypedValueBufferFactoryFactory>();
+        public override IRelationalMethodCallTranslatorProvider RelationalMethodCallTranslatorProvider => GetService<SqlServerMethodCallTranslatorProvider>();
+
     }
 }

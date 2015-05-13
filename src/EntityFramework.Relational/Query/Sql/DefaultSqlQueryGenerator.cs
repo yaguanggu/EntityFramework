@@ -747,6 +747,18 @@ namespace Microsoft.Data.Entity.Relational.Query.Sql
             return literalExpression;
         }
 
+        public virtual Expression VisitSqlFunctionExpression(SqlFunctionExpression sqlFunctionExpression)
+        {
+            _sql.Append(sqlFunctionExpression.FunctionName);
+            _sql.Append("(");
+
+            VisitJoin(sqlFunctionExpression.Arguments);
+
+            _sql.Append(")");
+
+            return sqlFunctionExpression;
+        }
+
         protected override Expression VisitUnaryExpression(UnaryExpression unaryExpression)
         {
             Check.NotNull(unaryExpression, nameof(unaryExpression));

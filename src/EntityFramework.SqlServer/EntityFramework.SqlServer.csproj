@@ -93,12 +93,14 @@
     <Compile Include="Migrations\CreateDatabaseOperation.cs" />
     <Compile Include="Migrations\DropDatabaseOperation.cs" />
     <Compile Include="Migrations\SqlServerHistoryRepository.cs" />
+    <Compile Include="Query\Methods\NewGuidTranslator.cs" />
     <Compile Include="Query\SqlServerQueryCompilationContext.cs" />
     <Compile Include="Query\SqlServerQueryGenerator.cs" />
     <Compile Include="SqlServerBuilderExtensions.cs" />
     <Compile Include="SqlServerDatabase.cs" />
     <Compile Include="SqlServerDatabaseExtensions.cs" />
     <Compile Include="SqlServerMetadataExtensions.cs" />
+    <Compile Include="SqlServerMethodCallTranslatorProvider.cs" />
     <Compile Include="SqlServerModelBuilderFactory.cs" />
     <Compile Include="Migrations\SqlServerModelDiffer.cs" />
     <Compile Include="SqlServerModelSource.cs" />
