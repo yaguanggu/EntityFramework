@@ -19,7 +19,8 @@ namespace Microsoft.Data.Entity.SqlServer
         {
             _sqlServerMethodCallTranslators = new List<IMethodCallTranslator>
             {
-                new NewGuidTranslator()
+                new NewGuidTranslator(),
+                new SubstringTranslator(),
             };
         }
 

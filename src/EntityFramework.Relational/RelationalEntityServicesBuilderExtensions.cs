@@ -40,7 +40,7 @@ namespace Microsoft.Data.Entity.Relational
                 .AddScoped<ModelDiffer>()
                 .AddScoped<RelationalDatabaseFactory>()
                 .AddScoped<RelationalValueGeneratorSelector>()
-                .AddScoped<IRelationalMethodCallTranslatorProvider, RelationalMethodCallTranslatorProvider>()
+                .AddScoped<RelationalMethodCallTranslatorProvider>()
                 .AddScoped(p => GetStoreServices(p).ModelDiffer)
                 .AddScoped(p => GetStoreServices(p).HistoryRepository)
                 .AddScoped(p => GetStoreServices(p).MigrationSqlGenerator)

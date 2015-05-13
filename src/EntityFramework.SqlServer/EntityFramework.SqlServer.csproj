@@ -94,6 +94,7 @@
     <Compile Include="Migrations\DropDatabaseOperation.cs" />
     <Compile Include="Migrations\SqlServerHistoryRepository.cs" />
     <Compile Include="Query\Methods\NewGuidTranslator.cs" />
+    <Compile Include="Query\Methods\SubstringTranslator.cs" />
     <Compile Include="Query\SqlServerQueryCompilationContext.cs" />
     <Compile Include="Query\SqlServerQueryGenerator.cs" />
     <Compile Include="SqlServerBuilderExtensions.cs" />

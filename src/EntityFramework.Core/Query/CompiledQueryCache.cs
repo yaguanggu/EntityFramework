@@ -17,14 +17,14 @@ using Microsoft.Data.Entity.Storage;
 using Microsoft.Data.Entity.Utilities;
 using Microsoft.Framework.Caching.Memory;
 using Remotion.Linq;
+using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.Clauses.StreamedData;
+using Remotion.Linq.Parsing;
 using Remotion.Linq.Parsing.ExpressionTreeVisitors.Transformation;
 using Remotion.Linq.Parsing.ExpressionTreeVisitors.TreeEvaluation;
 using Remotion.Linq.Parsing.Structure;
 using Remotion.Linq.Parsing.Structure.ExpressionTreeProcessors;
 using Remotion.Linq.Parsing.Structure.NodeTypeProviders;
-using Remotion.Linq.Clauses.Expressions;
-using Remotion.Linq.Parsing;
 
 namespace Microsoft.Data.Entity.Query
 {
@@ -351,9 +351,19 @@ namespace Microsoft.Data.Entity.Query
             {
                 protected override Expression VisitMethodCallExpression(MethodCallExpression expression)
                 {
-                    return IsQueryable(expression.Object) || IsQueryable(expression.Arguments.FirstOrDefault())
-                        ? base.VisitMethodCallExpression(expression)
-                        : new EvaluationPreventingExpression(expression);
+                    if (IsQueryable(expression.Object) || IsQueryable(expression.Arguments.FirstOrDefault()))
+                    {
+                        return base.VisitMethodCallExpression(expression);
+                    }
+
+                    return new EvaluationPreventingExpression(expression);
+                    //var instance = VisitExpression(expression.Object);
+                    //var arguments = expression.Arguments.Select(VisitExpression);
+
+                    //return new EvaluationPreventingExpression(
+                    //    instance != null
+                    //        ? Expression.Call(instance, expression.Method, arguments)
+                    //        : Expression.Call(expression.Method, arguments));
                 }
 
                 private bool IsQueryable(Expression expression)
@@ -369,12 +379,12 @@ namespace Microsoft.Data.Entity.Query
 
             private class EvaluationPreventingExpression : ExtensionExpression
             {
-                public Expression Argument { get; private set; }
+                public MethodCallExpression MethodCall { get; private set; }
 
-                public EvaluationPreventingExpression(Expression argument)
+                public EvaluationPreventingExpression(MethodCallExpression argument)
                     : base(argument.Type)
                 {
-                    Argument = argument;
+                    MethodCall = argument;
                 }
 
                 public override bool CanReduce
@@ -387,12 +397,22 @@ namespace Microsoft.Data.Entity.Query
 
                 public override Expression Reduce()
                 {
-                    return Argument;
+                    return MethodCall;
                 }
 
                 protected override Expression VisitChildren(ExpressionTreeVisitor visitor)
                 {
+                    var instance = visitor.VisitExpression(MethodCall.Object);
+                    var arguments = MethodCall.Arguments.Select(visitor.VisitExpression);
+
                     return this;
+
+                    //if (instance != null)
+                    //{
+                    //    return Call(instance, MethodCall.Method, arguments);
+                    //}
+
+                    //return Call(MethodCall.Method, arguments);
                 }
             }
         }

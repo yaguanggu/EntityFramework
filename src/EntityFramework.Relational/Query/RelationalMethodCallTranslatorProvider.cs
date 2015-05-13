@@ -7,7 +7,7 @@ using Microsoft.Framework.Logging;
 
 namespace Microsoft.Data.Entity.Relational.Query
 {
-    public class RelationalMethodCallTranslatorProvider : IRelationalMethodCallTranslatorProvider
+    public abstract class RelationalMethodCallTranslatorProvider : IRelationalMethodCallTranslatorProvider
     {
         private List<IMethodCallTranslator> _relationalMethodCallTranslators;
 
