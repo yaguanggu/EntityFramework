@@ -219,7 +219,7 @@ namespace Microsoft.Data.Entity.Relational.Query.ExpressionTreeVisitors
                         ? Expression.Call(operand, methodCallExpression.Method, arguments)
                         : Expression.Call(methodCallExpression.Method, arguments);
 
-                    foreach (var methodCallTranslator in _queryModelVisitor.QueryCompilationContext.MethodCallTranslatorProvider.MethodCallTranslators)
+                    foreach (var methodCallTranslator in _queryModelVisitor.QueryCompilationContext.FunctionTranslationProvider.MethodCallTranslators)
                     {
                         var translatedMethodCall = methodCallTranslator.Translate(boundExpression);
                         if (translatedMethodCall != null)
@@ -248,6 +248,19 @@ namespace Microsoft.Data.Entity.Relational.Query.ExpressionTreeVisitors
         protected override Expression VisitMemberExpression([NotNull] MemberExpression memberExpression)
         {
             Check.NotNull(memberExpression, nameof(memberExpression));
+
+            foreach (var propertyTranslator in _queryModelVisitor.QueryCompilationContext.FunctionTranslationProvider.PropertyTranslators)
+            {
+                if (propertyTranslator.CanTranslate(memberExpression))
+                {
+                    var newExpression = VisitExpression(memberExpression.Expression);
+                    var newMemberExpression = newExpression != memberExpression.Expression
+                        ? Expression.Property(newExpression, memberExpression.Member.Name)
+                        : memberExpression;
+
+                    return propertyTranslator.Translate(newMemberExpression);
+                }
+            }
 
             return _queryModelVisitor
                 .BindMemberExpression(
@@ -339,6 +352,7 @@ namespace Microsoft.Data.Entity.Relational.Query.ExpressionTreeVisitors
                 typeof(byte),
                 typeof(byte[]),
                 typeof(char),
+                typeof(decimal),
                 typeof(DateTime),
                 typeof(DateTimeOffset),
                 typeof(double),

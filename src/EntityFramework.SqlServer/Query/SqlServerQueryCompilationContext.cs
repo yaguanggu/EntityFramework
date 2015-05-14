@@ -28,7 +28,7 @@ namespace Microsoft.Data.Entity.SqlServer.Query
             [NotNull] IEntityKeyFactorySource entityKeyFactorySource,
             [NotNull] IClrAccessorSource<IClrPropertyGetter> clrPropertyGetterSource,
             [NotNull] IQueryMethodProvider queryMethodProvider,
-            [NotNull] IRelationalMethodCallTranslatorProvider methodCallTranslatorProvider,
+            [NotNull] IRelationalFunctionTranslationProvider methodCallTranslatorProvider,
             [NotNull] IRelationalValueBufferFactoryFactory valueBufferFactoryFactory)
             : base(
                 Check.NotNull(model, nameof(model)),

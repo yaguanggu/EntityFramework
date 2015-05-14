@@ -31,7 +31,7 @@ namespace Microsoft.Data.Entity.SqlServer
             [NotNull] IDbContextOptions options,
             [NotNull] ILoggerFactory loggerFactory,
             [NotNull] IRelationalValueBufferFactoryFactory valueBufferFactoryFactory,
-            [NotNull] IRelationalMethodCallTranslatorProvider methodCallTranslatorProvider)
+            [NotNull] IRelationalFunctionTranslationProvider methodCallTranslatorProvider)
             : base(
                 Check.NotNull(model, nameof(model)),
                 Check.NotNull(entityKeyFactorySource, nameof(entityKeyFactorySource)),
@@ -51,7 +51,7 @@ namespace Microsoft.Data.Entity.SqlServer
             ILinqOperatorProvider linqOperatorProvider,
             IResultOperatorHandler resultOperatorHandler,
             IQueryMethodProvider enumerableMethodProvider,
-            IRelationalMethodCallTranslatorProvider methodCallTranslatorProvider)
+            IRelationalFunctionTranslationProvider methodCallTranslatorProvider)
         {
             Check.NotNull(linqOperatorProvider, nameof(linqOperatorProvider));
             Check.NotNull(resultOperatorHandler, nameof(resultOperatorHandler));

@@ -9,13 +9,13 @@ using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using Microsoft.Data.Entity.Internal;
 using Microsoft.Data.Entity.Query.ExpressionTreeVisitors;
 using Microsoft.Data.Entity.Query.ResultOperators;
 using Microsoft.Data.Entity.Storage;
 using Microsoft.Data.Entity.Utilities;
 using Microsoft.Framework.Caching.Memory;
+using JetBrains.Annotations;
 using Remotion.Linq;
 using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.Clauses.StreamedData;
@@ -60,7 +60,7 @@ namespace Microsoft.Data.Entity.Query
                         var queryModel = CreateQueryParser().GetParsedQuery(q);
                         queryModel.TransformExpressions(e =>
                             e != null && e.CanReduce
-                            ? e.Reduce()
+                            ? new ReducingExpressionVisitor().VisitExpression(e)
                             : e);
 
                         var streamedSequenceInfo
@@ -281,58 +281,58 @@ namespace Microsoft.Data.Entity.Query
                 switch (expression.NodeType)
                 {
                     case ExpressionType.MemberAccess:
-                    {
-                        var memberExpression = (MemberExpression)expression;
-                        var @object = Evaluate(memberExpression.Expression, out parameterName);
-
-                        var fieldInfo = memberExpression.Member as FieldInfo;
-
-                        if (fieldInfo != null)
                         {
-                            parameterName = parameterName != null
-                                ? parameterName + "_" + fieldInfo.Name
-                                : fieldInfo.Name;
+                            var memberExpression = (MemberExpression)expression;
+                            var @object = Evaluate(memberExpression.Expression, out parameterName);
 
-                            try
+                            var fieldInfo = memberExpression.Member as FieldInfo;
+
+                            if (fieldInfo != null)
                             {
-                                return fieldInfo.GetValue(@object);
+                                parameterName = parameterName != null
+                                    ? parameterName + "_" + fieldInfo.Name
+                                    : fieldInfo.Name;
+
+                                try
+                                {
+                                    return fieldInfo.GetValue(@object);
+                                }
+                                catch
+                                {
+                                    // Try again when we compile the delegate
+                                }
                             }
-                            catch
+
+                            var propertyInfo = memberExpression.Member as PropertyInfo;
+
+                            if (propertyInfo != null)
                             {
-                                // Try again when we compile the delegate
+                                parameterName = parameterName != null
+                                    ? parameterName + "_" + propertyInfo.Name
+                                    : propertyInfo.Name;
+
+                                try
+                                {
+                                    return propertyInfo.GetValue(@object);
+                                }
+                                catch
+                                {
+                                    // Try again when we compile the delegate
+                                }
                             }
+
+                            break;
                         }
-
-                        var propertyInfo = memberExpression.Member as PropertyInfo;
-
-                        if (propertyInfo != null)
-                        {
-                            parameterName = parameterName != null
-                                ? parameterName + "_" + propertyInfo.Name
-                                : propertyInfo.Name;
-
-                            try
-                            {
-                                return propertyInfo.GetValue(@object);
-                            }
-                            catch
-                            {
-                                // Try again when we compile the delegate
-                            }
-                        }
-
-                        break;
-                    }
                     case ExpressionType.Constant:
-                    {
-                        return ((ConstantExpression)expression).Value;
-                    }
+                        {
+                            return ((ConstantExpression)expression).Value;
+                        }
                     case ExpressionType.Call:
-                    {
-                        parameterName = ((MethodCallExpression)expression).Method.Name;
+                        {
+                            parameterName = ((MethodCallExpression)expression).Method.Name;
 
-                        break;
-                    }
+                            break;
+                        }
                 }
 
                 if (parameterName == null)
@@ -356,14 +356,14 @@ namespace Microsoft.Data.Entity.Query
                         return base.VisitMethodCallExpression(expression);
                     }
 
-                    return new EvaluationPreventingExpression(expression);
-                    //var instance = VisitExpression(expression.Object);
-                    //var arguments = expression.Arguments.Select(VisitExpression);
+                    var newObject = VisitExpression(expression.Object);
+                    var newArguments = VisitAndConvert(expression.Arguments, "VisitMethodCallExpression");
 
-                    //return new EvaluationPreventingExpression(
-                    //    instance != null
-                    //        ? Expression.Call(instance, expression.Method, arguments)
-                    //        : Expression.Call(expression.Method, arguments));
+                    var newMethodCall = newObject != expression.Object || newArguments != expression.Arguments
+                        ? Expression.Call(newObject, expression.Method, newArguments)
+                        : expression;
+
+                    return new MethodCallEvaluationPreventingExpression(newMethodCall);
                 }
 
                 private bool IsQueryable(Expression expression)
@@ -375,13 +375,18 @@ namespace Microsoft.Data.Entity.Query
 
                     return typeof(IQueryable).GetTypeInfo().IsAssignableFrom(expression.Type.GetTypeInfo());
                 }
+
+                protected override Expression VisitMemberExpression(MemberExpression expression)
+                {
+                    return new PropertyEvaluationPreventingExpression(expression);
+                }
             }
 
-            private class EvaluationPreventingExpression : ExtensionExpression
+            private class MethodCallEvaluationPreventingExpression : ExtensionExpression
             {
                 public MethodCallExpression MethodCall { get; private set; }
 
-                public EvaluationPreventingExpression(MethodCallExpression argument)
+                public MethodCallEvaluationPreventingExpression(MethodCallExpression argument)
                     : base(argument.Type)
                 {
                     MethodCall = argument;
@@ -402,17 +407,54 @@ namespace Microsoft.Data.Entity.Query
 
                 protected override Expression VisitChildren(ExpressionTreeVisitor visitor)
                 {
-                    var instance = visitor.VisitExpression(MethodCall.Object);
-                    var arguments = MethodCall.Arguments.Select(visitor.VisitExpression);
+                    var newObject = visitor.VisitExpression(MethodCall.Object);
+                    var newArguments = visitor.VisitAndConvert(MethodCall.Arguments, "VisitChildren");
+
+                    if (newObject != MethodCall.Object
+                        || newArguments != MethodCall.Arguments)
+                    {
+                        return new MethodCallEvaluationPreventingExpression(
+                            Call(newObject, MethodCall.Method, newArguments));
+                    }
 
                     return this;
+                }
+            }
 
-                    //if (instance != null)
-                    //{
-                    //    return Call(instance, MethodCall.Method, arguments);
-                    //}
+            private class PropertyEvaluationPreventingExpression : ExtensionExpression
+            {
+                public MemberExpression MemberExpression { get; private set; }
 
-                    //return Call(MethodCall.Method, arguments);
+                public PropertyEvaluationPreventingExpression(MemberExpression argument)
+                    : base(argument.Type)
+                {
+                    MemberExpression = argument;
+                }
+
+                public override bool CanReduce
+                {
+                    get
+                    {
+                        return true;
+                    }
+                }
+
+                public override Expression Reduce()
+                {
+                    return MemberExpression;
+                }
+
+                protected override Expression VisitChildren(ExpressionTreeVisitor visitor)
+                {
+                    var newExpression = visitor.VisitExpression(MemberExpression.Expression);
+
+                    if (newExpression != MemberExpression.Expression)
+                    {
+                        return new PropertyEvaluationPreventingExpression(
+                            Property(newExpression, MemberExpression.Member.Name));
+                    }
+
+                    return this;
                 }
             }
         }

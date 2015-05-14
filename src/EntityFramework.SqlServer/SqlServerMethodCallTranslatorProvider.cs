@@ -14,17 +14,38 @@ namespace Microsoft.Data.Entity.SqlServer
     {
         private List<IMethodCallTranslator> _sqlServerMethodCallTranslators;
 
+        private List<IPropertyTranslator> _sqlServerPropertyTranslators;
+
         public SqlServerMethodCallTranslatorProvider(ILoggerFactory loggerFactory)
             : base(loggerFactory)
         {
             _sqlServerMethodCallTranslators = new List<IMethodCallTranslator>
             {
                 new NewGuidTranslator(),
-                new SubstringTranslator(),
+                new StringSubstringTranslator(),
+                new MathAbsTranslator(),
+                new MathCeilingTranslator(),
+                new MathFloorTranslator(),
+                new MathPowerTranslator(),
+                new MathRoundTranslator(),
+                new MathTruncateTranslator(),
+                new StringReplaceTranslator(),
+                new StringToLowerTranslator(),
+                new StringToUpperTranslator(),
+            };
+
+            _sqlServerPropertyTranslators = new List<IPropertyTranslator>
+            {
+                new StringLengthTranslator(),
+                new DateTimeNowTranslator(),
             };
         }
 
         public override IReadOnlyList<IMethodCallTranslator> MethodCallTranslators 
             => base.MethodCallTranslators.Concat(_sqlServerMethodCallTranslators).ToList();
+
+        public override IReadOnlyList<IPropertyTranslator> PropertyTranslators
+            => base.PropertyTranslators.Concat(_sqlServerPropertyTranslators).ToList();
+
     }
 }

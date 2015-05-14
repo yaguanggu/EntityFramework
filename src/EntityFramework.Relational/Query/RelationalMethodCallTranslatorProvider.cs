@@ -7,9 +7,10 @@ using Microsoft.Framework.Logging;
 
 namespace Microsoft.Data.Entity.Relational.Query
 {
-    public abstract class RelationalMethodCallTranslatorProvider : IRelationalMethodCallTranslatorProvider
+    public abstract class RelationalMethodCallTranslatorProvider : IRelationalFunctionTranslationProvider
     {
         private List<IMethodCallTranslator> _relationalMethodCallTranslators;
+        private List<IPropertyTranslator> _relationalPropertyTranslators;
 
         public RelationalMethodCallTranslatorProvider(ILoggerFactory loggerFactory)
         {
@@ -20,8 +21,12 @@ namespace Microsoft.Data.Entity.Relational.Query
                 new EqualsTranslator(loggerFactory),
                 new StartsWithTranslator(),
             };
+
+            _relationalPropertyTranslators = new List<IPropertyTranslator>();
         }
 
         public virtual IReadOnlyList<IMethodCallTranslator> MethodCallTranslators => _relationalMethodCallTranslators;
+
+        public virtual IReadOnlyList<IPropertyTranslator> PropertyTranslators => _relationalPropertyTranslators;
     }
 }

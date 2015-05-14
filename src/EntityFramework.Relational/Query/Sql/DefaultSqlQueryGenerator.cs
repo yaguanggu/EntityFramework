@@ -14,6 +14,7 @@ using Microsoft.Data.Entity.Relational.Query.ExpressionTreeVisitors;
 using Microsoft.Data.Entity.Utilities;
 using Remotion.Linq.Clauses;
 using Remotion.Linq.Parsing;
+using Microsoft.Data.Entity.Query.ExpressionTreeVisitors;
 
 namespace Microsoft.Data.Entity.Relational.Query.Sql
 {
@@ -842,6 +843,9 @@ namespace Microsoft.Data.Entity.Relational.Query.Sql
         protected virtual string GenerateLiteral([NotNull] object value)
             => string.Format(CultureInfo.InvariantCulture, "{0}", value);
 
+        protected virtual string GenerateLiteral(double value)
+            => value + "E0";
+
         protected virtual string GenerateLiteral(bool value)
             => value ? TrueLiteral : FalseLiteral;
 
@@ -917,15 +921,6 @@ namespace Microsoft.Data.Entity.Relational.Query.Sql
 
                 return base.VisitBinaryExpression(expression);
             }
-        }
-
-        private class ReducingExpressionVisitor : ExpressionTreeVisitor
-        {
-            public override Expression VisitExpression(Expression node)
-                => node != null
-                   && node.CanReduce
-                    ? base.VisitExpression(node.Reduce())
-                    : base.VisitExpression(node);
         }
     }
 }

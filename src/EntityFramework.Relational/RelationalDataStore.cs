@@ -27,7 +27,7 @@ namespace Microsoft.Data.Entity.Relational
         private readonly IBatchExecutor _batchExecutor;
         private readonly IRelationalConnection _connection;
         private readonly IDbContextOptions _options;
-        private readonly IRelationalMethodCallTranslatorProvider _methodCallTranslatorProvider;
+        private readonly IRelationalFunctionTranslationProvider _methodCallTranslatorProvider;
 
         protected RelationalDataStore(
             [NotNull] IModel model,
@@ -40,7 +40,7 @@ namespace Microsoft.Data.Entity.Relational
             [NotNull] IDbContextOptions options,
             [NotNull] ILoggerFactory loggerFactory,
             [NotNull] IRelationalValueBufferFactoryFactory valueBufferFactoryFactory,
-            [NotNull] IRelationalMethodCallTranslatorProvider methodCallTranslatorProvider)
+            [NotNull] IRelationalFunctionTranslationProvider methodCallTranslatorProvider)
             : base(
                 Check.NotNull(model, nameof(model)),
                 Check.NotNull(entityKeyFactorySource, nameof(entityKeyFactorySource)),
@@ -109,7 +109,7 @@ namespace Microsoft.Data.Entity.Relational
             [NotNull] ILinqOperatorProvider linqOperatorProvider,
             [NotNull] IResultOperatorHandler resultOperatorHandler,
             [NotNull] IQueryMethodProvider queryMethodProvider,
-            [NotNull] IRelationalMethodCallTranslatorProvider methodCallTranslatorProvider)
+            [NotNull] IRelationalFunctionTranslationProvider methodCallTranslatorProvider)
             => new RelationalQueryCompilationContext(
                 Model,
                 Logger,

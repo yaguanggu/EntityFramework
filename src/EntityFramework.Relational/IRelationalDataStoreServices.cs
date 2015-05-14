@@ -22,6 +22,6 @@ namespace Microsoft.Data.Entity.Relational
         IBatchExecutor BatchExecutor { get; }
         IRelationalValueBufferFactoryFactory ValueBufferFactoryFactory { get; }
         IRelationalDataStoreCreator RelationalDataStoreCreator { get; }
-        IRelationalMethodCallTranslatorProvider RelationalMethodCallTranslatorProvider { get; }
+        IRelationalFunctionTranslationProvider RelationalMethodCallTranslatorProvider { get; }
     }
 }

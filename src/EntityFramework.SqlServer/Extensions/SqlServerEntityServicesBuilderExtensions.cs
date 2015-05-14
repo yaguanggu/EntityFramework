@@ -42,7 +42,7 @@ namespace Microsoft.Framework.DependencyInjection
                     .AddScoped<SqlServerMigrationSqlGenerator>()
                     .AddScoped<SqlServerDataStoreCreator>()
                     .AddScoped<SqlServerHistoryRepository>()
-                    .AddScoped<IRelationalMethodCallTranslatorProvider, SqlServerMethodCallTranslatorProvider>());
+                    .AddScoped<IRelationalFunctionTranslationProvider, SqlServerMethodCallTranslatorProvider>());
 
             return builder;
         }

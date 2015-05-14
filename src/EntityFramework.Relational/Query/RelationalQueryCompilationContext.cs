@@ -31,7 +31,7 @@ namespace Microsoft.Data.Entity.Relational.Query
             [NotNull] IEntityKeyFactorySource entityKeyFactorySource,
             [NotNull] IClrAccessorSource<IClrPropertyGetter> clrPropertyGetterSource,
             [NotNull] IQueryMethodProvider queryMethodProvider,
-            [NotNull] IRelationalMethodCallTranslatorProvider methodCallTranslatorProvider,
+            [NotNull] IRelationalFunctionTranslationProvider methodCallTranslatorProvider,
             [NotNull] IRelationalValueBufferFactoryFactory valueBufferFactoryFactory)
             : base(
                 Check.NotNull(model, nameof(model)),
@@ -47,7 +47,7 @@ namespace Microsoft.Data.Entity.Relational.Query
             Check.NotNull(valueBufferFactoryFactory, nameof(valueBufferFactoryFactory));
 
             QueryMethodProvider = queryMethodProvider;
-            MethodCallTranslatorProvider = methodCallTranslatorProvider;
+            FunctionTranslationProvider = methodCallTranslatorProvider;
             ValueBufferFactoryFactory = valueBufferFactoryFactory;
         }
 
@@ -77,7 +77,7 @@ namespace Microsoft.Data.Entity.Relational.Query
 
         public virtual IQueryMethodProvider QueryMethodProvider { get; }
 
-        public virtual IRelationalMethodCallTranslatorProvider MethodCallTranslatorProvider { get; }
+        public virtual IRelationalFunctionTranslationProvider FunctionTranslationProvider { get; }
 
         public virtual IRelationalValueBufferFactoryFactory ValueBufferFactoryFactory { get; }
 

@@ -149,6 +149,7 @@
     <Compile Include="Migrations\Sql\MigrationSqlGenerator.cs" />
     <Compile Include="Migrations\Infrastructure\ModelDiffer.cs" />
     <Compile Include="Query\Expressions\SqlFunctionExpression.cs" />
+    <Compile Include="Query\Methods\IPropertyTranslator.cs" />
     <Compile Include="Query\RelationalMethodCallTranslatorProvider.cs" />
     <Compile Include="RelationalDatabaseFactory.cs" />
     <Compile Include="RelationalDataStoreServices.cs" />

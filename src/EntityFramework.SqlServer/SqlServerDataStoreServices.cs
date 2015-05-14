@@ -44,7 +44,7 @@ namespace Microsoft.Data.Entity.SqlServer
         public override IModificationCommandBatchFactory ModificationCommandBatchFactory => GetService<SqlServerModificationCommandBatchFactory>();
         public override ICommandBatchPreparer CommandBatchPreparer => GetService<SqlServerCommandBatchPreparer>();
         public override IRelationalValueBufferFactoryFactory ValueBufferFactoryFactory => GetService<UntypedValueBufferFactoryFactory>();
-        public override IRelationalMethodCallTranslatorProvider RelationalMethodCallTranslatorProvider => GetService<SqlServerMethodCallTranslatorProvider>();
+        public override IRelationalFunctionTranslationProvider RelationalMethodCallTranslatorProvider => GetService<SqlServerMethodCallTranslatorProvider>();
 
     }
 }

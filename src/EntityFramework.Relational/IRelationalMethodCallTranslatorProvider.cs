@@ -6,8 +6,10 @@ using System.Collections.Generic;
 
 namespace Microsoft.Data.Entity.Relational
 {
-    public interface IRelationalMethodCallTranslatorProvider
+    public interface IRelationalFunctionTranslationProvider
     {
         IReadOnlyList<IMethodCallTranslator> MethodCallTranslators { get;  }
+
+        IReadOnlyList<IPropertyTranslator> PropertyTranslators { get; }
     }
 }
