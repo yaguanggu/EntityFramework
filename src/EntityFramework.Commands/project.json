@@ -26,9 +26,10 @@
         "Microsoft.Framework.CommandLineUtils.Sources": { "version": "1.0.0-*", "type": "build" }
       }
     },
-    ".NETPortable,Version=v4.5,Profile=Profile7": {
-      "bin": {
-        "assembly": "lib\\portable-net45+win\\_._"
+    "netportable50": {
+      "dependencies": {
+        "Microsoft.AspNet.Hosting": "1.0.0-*",
+        "Microsoft.Framework.CommandLineUtils.Sources": { "version": "1.0.0-*", "type": "build" }        
       }
     }
   },
