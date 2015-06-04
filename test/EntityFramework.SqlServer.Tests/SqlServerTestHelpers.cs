@@ -15,7 +15,7 @@ namespace Microsoft.Data.Entity.Tests
 
         public new static SqlServerTestHelpers Instance { get; } = new SqlServerTestHelpers();
 
-        protected override EntityFrameworkServicesBuilder AddProviderServices(EntityFrameworkServicesBuilder builder)
+        public override EntityFrameworkServicesBuilder AddProviderServices(EntityFrameworkServicesBuilder builder)
         {
             return builder.AddSqlServer();
         }

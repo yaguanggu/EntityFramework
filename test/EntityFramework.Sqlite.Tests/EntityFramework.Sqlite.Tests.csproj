@@ -36,11 +36,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiConsistencyTest.cs" />
-    <Compile Include="Extensions\SqliteEntityOptionsBuilderExtensionsTest.cs" />
+    <Compile Include="SqliteEntityOptionsBuilderExtensionsTest.cs" />
     <Compile Include="Metadata\Builders\SqliteBuilderExtensionsTest.cs" />
     <Compile Include="Metadata\SqliteMetadataExtensionsTest.cs" />
     <Compile Include="Migrations\SqliteMigrationSqlGeneratorTest.cs" />
+    <Compile Include="SqliteEntityFrameworkServicesBuilderExtensionsTest.cs" />
     <Compile Include="SqliteSqlGeneratorTest.cs" />
+    <Compile Include="SqliteTestHelpers.cs" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +57,10 @@
     <ProjectReference Include="..\..\src\EntityFramework.Sqlite\EntityFramework.Sqlite.csproj">
       <Project>{e340807b-ecbb-41df-a164-23fe833c76de}</Project>
       <Name>EntityFramework.Sqlite</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EntityFramework.Core.FunctionalTests\EntityFramework.Core.FunctionalTests.csproj">
+      <Project>{6ab933c7-de2a-45f2-bdc6-e71a01ef7756}</Project>
+      <Name>EntityFramework.Core.FunctionalTests</Name>
     </ProjectReference>
     <ProjectReference Include="..\EntityFramework.Core.Tests\EntityFramework.Core.Tests.csproj">
       <Project>{ef361118-7d0d-453e-ada4-2f24fbee196c}</Project>

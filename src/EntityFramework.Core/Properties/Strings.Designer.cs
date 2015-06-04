@@ -253,6 +253,14 @@ namespace Microsoft.Data.Entity.Internal
         }
 
         /// <summary>
+        /// {addProviderMethodName} has already been called on the service collection.
+        /// </summary>
+        public static string MultipleCallsToAddProvider([CanBeNull] object addProviderMethodName)
+        {
+            return string.Format(CultureInfo.CurrentCulture, GetString("MultipleCallsToAddProvider", "addProviderMethodName"), addProviderMethodName);
+        }
+
+        /// <summary>
         /// No data stores are configured. Configure a data store by overriding OnConfiguring in your DbContext class or in the AddDbContext method when setting up services.
         /// </summary>
         public static string NoDataStoreConfigured

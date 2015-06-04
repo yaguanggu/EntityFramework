@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.Data.Sqlite;
 using Xunit;
 
-namespace Microsoft.Data.Entity.Sqlite.Extensions
+namespace Microsoft.Data.Entity.Sqlite
 {
     public class SqliteEntityOptionsBuilderExtensionsTest
     {

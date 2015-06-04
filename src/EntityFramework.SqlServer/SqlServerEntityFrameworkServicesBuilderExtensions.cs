@@ -1,6 +1,9 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
+using System.Linq;
+using JetBrains.Annotations;
 using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Relational;
 using Microsoft.Data.Entity.Relational.Query.Methods;
@@ -12,20 +15,28 @@ using Microsoft.Data.Entity.SqlServer.Update;
 using Microsoft.Data.Entity.SqlServer.ValueGeneration;
 using Microsoft.Data.Entity.Storage;
 using Microsoft.Data.Entity.Utilities;
-using JetBrains.Annotations;
+using CoreStrings = Microsoft.Data.Entity.Internal.Strings;
 
 // ReSharper disable once CheckNamespace
 
 namespace Microsoft.Framework.DependencyInjection
 {
-    public static class SqlServerEntityServicesBuilderExtensions
+    public static class SqlServerEntityFrameworkServicesBuilderExtensions
     {
         public static EntityFrameworkServicesBuilder AddSqlServer([NotNull] this EntityFrameworkServicesBuilder builder)
         {
             Check.NotNull(builder, nameof(builder));
 
-            ((IAccessor<IServiceCollection>)builder.AddRelational()).Service
-                .AddSingleton<IDataStoreSource, SqlServerDataStoreSource>()
+            var serviceCollection = ((IAccessor<IServiceCollection>)builder.AddRelational()).Service;
+
+            if (serviceCollection.Any(d
+                => d.ServiceType == typeof(IDataStoreSource)
+                   && d.ImplementationType == typeof(SqlServerDataStoreSource)))
+            {
+                throw new InvalidOperationException(CoreStrings.MultipleCallsToAddProvider(nameof(AddSqlServer)));
+            }
+
+            serviceCollection.AddSingleton<IDataStoreSource, SqlServerDataStoreSource>()
                 .TryAdd(new ServiceCollection()
                     .AddSingleton<SqlServerModelBuilderFactory>()
                     .AddSingleton<ISqlServerValueGeneratorCache, SqlServerValueGeneratorCache>()
