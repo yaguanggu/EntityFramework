@@ -31,7 +31,7 @@ namespace Microsoft.Framework.DependencyInjection
                     .AddSingleton<ISqlServerValueGeneratorCache, SqlServerValueGeneratorCache>()
                     .AddSingleton<ISqlServerSqlGenerator, SqlServerSqlGenerator>()
                     .AddSingleton<SqlServerTypeMapper>()
-                    .AddSingleton<SqlServerModelSource>()
+                    .AddScoped<SqlServerModelSource>()
                     .AddSingleton<SqlServerMetadataExtensionProvider>()
                     .AddScoped<ISqlServerSequenceValueGeneratorFactory, SqlServerSequenceValueGeneratorFactory>()
                     .AddScoped<SqlServerModificationCommandBatchFactory>()
